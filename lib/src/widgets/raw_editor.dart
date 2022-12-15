@@ -4,6 +4,7 @@ import 'dart:math' as math;
 // ignore: unnecessary_import
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -30,6 +31,7 @@ import 'cursor.dart';
 import 'default_styles.dart';
 import 'delegate.dart';
 import 'editor.dart';
+import 'embeds/default_embed_builder.dart';
 import 'keyboard_listener.dart';
 import 'link.dart';
 import 'proxy.dart';
@@ -50,7 +52,7 @@ class RawEditor extends StatefulWidget {
       required this.cursorStyle,
       required this.selectionColor,
       required this.selectionCtrls,
-      required this.embedBuilder,
+      this.embedBuilder = defaultEmbedBuilder,
       Key? key,
       this.scrollable = true,
       this.padding = EdgeInsets.zero,

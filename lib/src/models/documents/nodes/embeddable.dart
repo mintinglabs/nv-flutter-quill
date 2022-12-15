@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+
 /// An object which can be embedded into a Quill document.
 ///
 /// See also:
@@ -24,6 +26,41 @@ class Embeddable {
 
     return Embeddable(m.keys.first, m.values.first);
   }
+
+  // Refer to https://www.fileformat.info/info/unicode/char/fffc/index.htm
+  static const kObjectReplacementCharacter = '\uFFFC';
+
+  String get toDetailPlantText {
+    switch (type) {
+      case BlockEmbed.imageType:
+      case BlockEmbed.videoType:
+      case BlockEmbed.linkPreviewType:
+        return kObjectReplacementCharacter;
+
+      case InlineBlockEmbed.hashtagType:
+        return data;
+
+      case InlineBlockEmbed.hyperlinkType:
+        return _fetchUrl(data);
+
+      default:
+        return data;
+    }
+  }
+
+  String _fetchUrl(String data) {
+    try {
+      final Map<String, dynamic> jsonData = jsonDecode(data);
+      var link = '';
+      jsonData.forEach((key, value) {
+        link = value;
+      });
+      return link;
+    } catch (e) {
+      debugPrint('[[ Embeddable._fetchUrl ]]: error:$e');
+      return '';
+    }
+  }
 }
 
 /// There are two built-in embed types supported by Quill documents, however
@@ -44,6 +81,10 @@ class BlockEmbed extends Embeddable {
   static const String customType = 'custom';
   static BlockEmbed custom(CustomBlockEmbed customBlock) =>
       BlockEmbed(customType, customBlock.toJsonString());
+
+  static const String linkPreviewType = 'linkPreview';
+  static BlockEmbed linkPreview(String linkUrl) =>
+      BlockEmbed(linkPreviewType, linkUrl);
 }
 
 class CustomBlockEmbed extends BlockEmbed {
@@ -55,4 +96,16 @@ class CustomBlockEmbed extends BlockEmbed {
     final embeddable = Embeddable.fromJson(jsonDecode(data));
     return CustomBlockEmbed(embeddable.type, embeddable.data);
   }
+}
+
+class InlineBlockEmbed extends Embeddable {
+  InlineBlockEmbed(String type, String data) : super(type, data);
+
+  static const String hashtagType = 'hashtag';
+  static InlineBlockEmbed hashTag(String content) =>
+      InlineBlockEmbed(hashtagType, content);
+
+  static const String hyperlinkType = 'hyperlink';
+  static InlineBlockEmbed hyperlink(String content) =>
+      InlineBlockEmbed(hyperlinkType, content);
 }

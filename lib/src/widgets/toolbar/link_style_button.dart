@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../models/documents/attribute.dart';
+import '../../models/documents/nodes/embeddable.dart';
 import '../../models/rules/insert.dart';
 import '../../models/themes/quill_dialog_theme.dart';
 import '../../models/themes/quill_icon_theme.dart';
@@ -81,7 +84,6 @@ class _LinkStyleButtonState extends State<LinkStyleButton> {
           : (widget.iconTheme?.iconUnselectedFillColor ?? theme.canvasColor),
       borderRadius: widget.iconTheme?.borderRadius ?? 2,
       onPressed: pressedHandler,
-      afterPressed: widget.afterButtonPressed,
     );
   }
 
@@ -138,8 +140,11 @@ class _LinkStyleButtonState extends State<LinkStyleButton> {
         length = range.end - range.start;
       }
     }
-    widget.controller.replaceText(index, length, text, null);
-    widget.controller.formatText(index, text.length, LinkAttribute(link));
+    final model = {text: link};
+    widget.controller.replaceText(
+        index, 0, InlineBlockEmbed.hyperlink(json.encode(model)), null);
+    widget.controller
+        .replaceText(index + 1, 0, BlockEmbed.linkPreview(link), null);
   }
 }
 

@@ -68,6 +68,9 @@ class Line extends Container<Leaf?> {
   String toPlainText() => '${super.toPlainText()}\n';
 
   @override
+  String toDetailPlainText() => '${super.toDetailPlainText()}\n';
+
+  @override
   String toString() {
     final body = children.join(' → ');
     final styleString = style.isNotEmpty ? ' $style' : '';

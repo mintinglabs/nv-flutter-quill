@@ -42,7 +42,10 @@ class Attribute<T> {
     Attribute.style.key: Attribute.style,
     Attribute.token.key: Attribute.token,
     Attribute.script.key: Attribute.script,
+    Attribute.hashtag.key: Attribute.hashtag,
   });
+
+  static const HashtagAttribute hashtag = HashtagAttribute();
 
   static const BoldAttribute bold = BoldAttribute();
 
@@ -241,6 +244,10 @@ class Attribute<T> {
   String toString() {
     return 'Attribute{key: $key, scope: $scope, value: $value}';
   }
+}
+
+class HashtagAttribute extends Attribute<bool> {
+  const HashtagAttribute() : super('hashtag', AttributeScope.INLINE, true);
 }
 
 class BoldAttribute extends Attribute<bool> {

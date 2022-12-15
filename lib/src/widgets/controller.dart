@@ -15,6 +15,9 @@ import '../utils/delta.dart';
 typedef ReplaceTextCallback = bool Function(int index, int len, Object? data);
 typedef DeleteCallback = void Function(int cursorPosition, bool forward);
 
+typedef HashtagCallback = Future<void> Function(
+    int index, int len, String data);
+
 class QuillController extends ChangeNotifier {
   QuillController({
     required Document document,
@@ -24,6 +27,7 @@ class QuillController extends ChangeNotifier {
     this.onDelete,
     this.onSelectionCompleted,
     this.onSelectionChanged,
+    this.onHashtagTriggered,
   })  : _document = document,
         _selection = selection,
         _keepStyleOnNewLine = keepStyleOnNewLine;
@@ -61,6 +65,9 @@ class QuillController extends ChangeNotifier {
 
   /// Custom delete handler
   DeleteCallback? onDelete;
+
+  /// Custom Hashtag triggered
+  HashtagCallback? onHashtagTriggered;
 
   void Function()? onSelectionCompleted;
   void Function(TextSelection textSelection)? onSelectionChanged;
@@ -192,6 +199,25 @@ class QuillController extends ChangeNotifier {
       return;
     }
 
+    // [[START]]: GTStudio : Hashtag handler =====
+    if (_isHashtagSymbol(data)) {
+      toggledStyle = toggledStyle.put(const HashtagAttribute());
+      _onHashtagCallback(index, len, data as String);
+    }
+
+    var isHashtagActivating = _isHashtagAttributeToggled(index);
+    var isHashtagComplete = false;
+
+    if (isHashtagActivating) {
+      isHashtagComplete = _isHashtagEndingSymbol(data);
+
+      if (!isHashtagComplete) {
+        _onHashtagCallback(index, len, data as String);
+      }
+
+      isHashtagActivating = !isHashtagComplete;
+    } // [[END]]: GTStudio : Hashtag handler =====
+
     Delta? delta;
     if (len > 0 || data is! String || data.isNotEmpty) {
       delta = document.replace(index, len, data);
@@ -210,7 +236,31 @@ class QuillController extends ChangeNotifier {
           shouldRetainDelta = false;
         }
       }
-      if (shouldRetainDelta) {
+
+      // [START]: GTStudio: Replace hashtag attribute as Embed.
+      if (isHashtagComplete) {
+        final hashtagSymbolIndex = _indexOfHashtagFromCurrent(index);
+        final hashtagString =
+            document.toPlainText().substring(hashtagSymbolIndex, index);
+        final embedHashtag = InlineBlockEmbed.hashTag(hashtagString);
+
+        void disableStyleOfWhitespaceEndSymbol() {
+          formatText(index, 1, Attribute.clone(HashtagAttribute(), null));
+        }
+
+        if (data is String && data != hashtagSymbol) {
+          disableStyleOfWhitespaceEndSymbol();
+        }
+        document.replace(
+            hashtagSymbolIndex, hashtagString.length, embedHashtag);
+
+        // Move cursor behind hashtag embed
+        textSelection = TextSelection.collapsed(offset: hashtagSymbolIndex + 2);
+
+        shouldRetainDelta = false;
+      } // [END]: GTStudio: Replace hashtag attribute as Embed.
+
+      if (shouldRetainDelta && !isHashtagActivating) {
         final retainDelta = Delta()
           ..retain(index)
           ..retain(data is String ? data.length : 1, toggledStyle.toJson());
@@ -250,6 +300,41 @@ class QuillController extends ChangeNotifier {
     }
     notifyListeners();
     ignoreFocusOnTextChange = false;
+  }
+
+  bool _isHashtagEndingSymbol(Object? data) =>
+      // Check end symbol(whitespace/another hashtag)
+      (_isHashtagSymbol(data)) || _isWhiteSpace(data) || _isNewLine(data);
+
+  bool _isNewLine(Object? data) => data is String && data == '\n';
+
+  bool _isWhiteSpace(Object? data) => data is String && data == '\u0020';
+
+  bool _isHashtagSymbol(Object? data) =>
+      data is String && data == hashtagSymbol;
+
+  bool _isHashtagAttributeToggled(int index) {
+    return document
+        .collectStyle(index > 0 ? index - 1 : index, 1)
+        .containsKey(Attribute.hashtag.key);
+  }
+
+  void _onHashtagCallback(int index, int len, String currentChar) {
+    final hashtagIndex = _indexOfHashtagFromCurrent(index);
+    final hashtagString = document.toPlainText().substring(hashtagIndex, index);
+    onHashtagTriggered?.call(index, len, hashtagString + currentChar);
+  }
+
+  static const String hashtagSymbol = '#';
+
+  /// Define forward search index of hashtag symbol method.
+  int _indexOfHashtagFromCurrent(int currentIndex) {
+    final plainText = document.toPlainText();
+    for (var pos = currentIndex - 1; pos >= 0; pos--) {
+      final char = plainText.substring(pos, pos + 1);
+      if (char == hashtagSymbol) return pos;
+    }
+    return currentIndex;
   }
 
   /// Called in two cases:

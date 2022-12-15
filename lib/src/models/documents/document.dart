@@ -348,6 +348,9 @@ class Document {
   /// Returns plain text representation of this document.
   String toPlainText() => _root.children.map((e) => e.toPlainText()).join();
 
+  String toDetailPlainText() =>
+      _root.children.map((e) => e.toDetailPlainText()).join();
+
   void _loadDocument(Delta doc) {
     if (doc.isEmpty) {
       throw ArgumentError.value(doc, 'Document Delta cannot be empty.');

@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 import 'package:tuple/tuple.dart';
 
+import '../../flutter_quill.dart';
 import '../models/documents/document.dart';
 import '../models/documents/nodes/container.dart' as container_node;
 import '../models/documents/nodes/embeddable.dart';
@@ -203,7 +204,6 @@ class QuillEditor extends StatefulWidget {
       padding: EdgeInsets.zero,
       keyboardAppearance: keyboardAppearance ?? Brightness.light,
       locale: locale,
-      embedBuilders: embedBuilders,
     );
   }
 
@@ -542,6 +542,8 @@ class QuillEditorState extends State<QuillEditor>
           return builder.build(context, controller, _node, readOnly);
         }
       }
+
+      return defaultEmbedBuilder(context, controller, node, readOnly);
     }
 
     throw UnimplementedError(
