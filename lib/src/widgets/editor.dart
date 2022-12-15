@@ -633,8 +633,19 @@ class _QuillEditorSelectionGestureDetectorBuilder
     return false;
   }
 
+  bool hasTapDownShowToolbar = false;
+
   @override
   void onTapDown(TapDownDetails details) {
+    // by NOVAAPP-1036 single tap show tool bar
+    if (hasTapDownShowToolbar) {
+      editor!.hideToolbar();
+      hasTapDownShowToolbar = false;
+    } else {
+      editor!.showToolbar();
+      hasTapDownShowToolbar = true;
+    }
+
     if (_state.widget.onTapDown != null) {
       if (renderEditor != null &&
           _state.widget.onTapDown!(
@@ -642,6 +653,7 @@ class _QuillEditorSelectionGestureDetectorBuilder
         return;
       }
     }
+
     super.onTapDown(details);
   }
 
@@ -659,8 +671,8 @@ class _QuillEditorSelectionGestureDetectorBuilder
         _state.widget.onTapUp!(details, renderEditor!.getPositionForOffset)) {
       return;
     }
-
-    editor!.hideToolbar();
+    // by NOVAAPP-1036 single tap show tool bar
+    // editor!.hideToolbar();
 
     try {
       if (delegate.selectionEnabled && !_isPositionSelected(details)) {
