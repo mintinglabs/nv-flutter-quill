@@ -85,7 +85,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
 
-      if (widget.attribute.runtimeType is BoldAttribute) {
+      if (widget.attribute.key == Attribute.bold.key) {
         _isToggled = widget.controller.boldStyle;
       } else {
         _isToggled = _getIsToggled(_selectionStyle.attributes);
@@ -100,7 +100,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   }
 
   void _didChangeEditingValue() {
-    if (widget.attribute.runtimeType is BoldAttribute) {
+    if (widget.attribute.key == Attribute.bold.key) {
       setState(() => _isToggled = widget.controller.boldStyle);
     } else {
       setState(() => _isToggled = _getIsToggled(_selectionStyle.attributes));
@@ -119,7 +119,7 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   }
 
   void _toggleAttribute() {
-    if (widget.attribute.runtimeType is BoldAttribute) {
+    if (widget.attribute.key == Attribute.bold.key) {
       widget.controller.boldStyle = !widget.controller.boldStyle;
 
       widget.controller.formatSelection(!widget.controller.boldStyle
