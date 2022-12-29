@@ -84,7 +84,12 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_didChangeEditingValue);
       widget.controller.addListener(_didChangeEditingValue);
-      _isToggled = _getIsToggled(_selectionStyle.attributes);
+
+      if (widget.attribute.runtimeType is BoldAttribute) {
+        _isToggled = widget.controller.boldStyle;
+      } else {
+        _isToggled = _getIsToggled(_selectionStyle.attributes);
+      }
     }
   }
 
@@ -95,7 +100,11 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   }
 
   void _didChangeEditingValue() {
-    setState(() => _isToggled = _getIsToggled(_selectionStyle.attributes));
+    if (widget.attribute.runtimeType is BoldAttribute) {
+      setState(() => _isToggled = widget.controller.boldStyle);
+    } else {
+      setState(() => _isToggled = _getIsToggled(_selectionStyle.attributes));
+    }
   }
 
   bool _getIsToggled(Map<String, Attribute> attrs) {
@@ -110,9 +119,17 @@ class _ToggleStyleButtonState extends State<ToggleStyleButton> {
   }
 
   void _toggleAttribute() {
-    widget.controller.formatSelection(_isToggled!
-        ? Attribute.clone(widget.attribute, null)
-        : widget.attribute);
+    if (widget.attribute.runtimeType is BoldAttribute) {
+      widget.controller.boldStyle = !widget.controller.boldStyle;
+
+      widget.controller.formatSelection(!widget.controller.boldStyle
+          ? Attribute.clone(widget.attribute, null)
+          : widget.attribute);
+    } else {
+      widget.controller.formatSelection(_isToggled!
+          ? Attribute.clone(widget.attribute, null)
+          : widget.attribute);
+    }
   }
 }
 

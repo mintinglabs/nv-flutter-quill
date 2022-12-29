@@ -190,6 +190,9 @@ class QuillController extends ChangeNotifier {
         const TextSelection.collapsed(offset: 0));
   }
 
+  // NOVA : NOVAAPP-269 由於非英文輸入法是刪除後再插入，所以需要保持選擇狀態
+  bool boldStyle = false;
+
   void replaceText(
       int index, int len, Object? data, TextSelection? textSelection,
       {bool ignoreFocus = false}) {
@@ -197,6 +200,14 @@ class QuillController extends ChangeNotifier {
 
     if (onReplaceText != null && !onReplaceText!(index, len, data)) {
       return;
+    }
+
+    if (len > 0 || data is! String || data.isNotEmpty) {
+      if (boldStyle) {
+        toggledStyle = toggledStyle.put(const BoldAttribute());
+      } else {
+        toggledStyle = toggledStyle.put(Attribute.clone(BoldAttribute(), null));
+      }
     }
 
     // [[START]]: GTStudio : Hashtag handler =====
@@ -222,9 +233,12 @@ class QuillController extends ChangeNotifier {
     if (len > 0 || data is! String || data.isNotEmpty) {
       delta = document.replace(index, len, data);
       var shouldRetainDelta = toggledStyle.isNotEmpty &&
-          delta.isNotEmpty &&
-          delta.length <= 2 &&
-          delta.last.isInsert;
+              delta.isNotEmpty &&
+              delta.length <= 2 &&
+              delta.last.isInsert ||
+          // NOVA : NOVAAPP-269 非英文輸入法的情況，比如輸入a點擊選擇中文字'啊'，會多一步刪除的操作
+          (delta.length == 3 && delta[1].isInsert && delta.last.isDelete);
+
       if (shouldRetainDelta &&
           toggledStyle.isNotEmpty &&
           delta.length == 2 &&
@@ -261,7 +275,12 @@ class QuillController extends ChangeNotifier {
       } // [END]: GTStudio: Replace hashtag attribute as Embed.
 
       if (shouldRetainDelta && !isHashtagActivating) {
-        final retainDelta = Delta()
+        var retainDelta = Delta();
+        //  NOVA : NOVAAPP-269 移除多餘的刪除的操作，讓屬性切換正常
+        if (retainDelta.length > 2 && retainDelta.last.isDelete) {
+          retainDelta = retainDelta.slice(0, retainDelta.length - 1);
+        }
+        retainDelta
           ..retain(index)
           ..retain(data is String ? data.length : 1, toggledStyle.toJson());
         document.compose(retainDelta, ChangeSource.LOCAL);
