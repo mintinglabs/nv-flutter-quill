@@ -206,7 +206,8 @@ class QuillController extends ChangeNotifier {
       if (boldStyle) {
         toggledStyle = toggledStyle.put(const BoldAttribute());
       } else {
-        toggledStyle = toggledStyle.put(Attribute.clone(BoldAttribute(), null));
+        toggledStyle =
+            toggledStyle.put(Attribute.clone(const BoldAttribute(), null));
       }
     }
 
@@ -259,7 +260,7 @@ class QuillController extends ChangeNotifier {
         final embedHashtag = InlineBlockEmbed.hashTag(hashtagString);
 
         void disableStyleOfWhitespaceEndSymbol() {
-          formatText(index, 1, Attribute.clone(HashtagAttribute(), null));
+          formatText(index, 1, Attribute.clone(const HashtagAttribute(), null));
         }
 
         if (data is String && data != hashtagSymbol) {
@@ -269,7 +270,7 @@ class QuillController extends ChangeNotifier {
             hashtagSymbolIndex, hashtagString.length, embedHashtag);
 
         // Move cursor behind hashtag embed
-        textSelection = TextSelection.collapsed(offset: hashtagSymbolIndex + 2);
+        textSelection = TextSelection.collapsed(offset: hashtagSymbolIndex + 1);
 
         shouldRetainDelta = false;
       } // [END]: GTStudio: Replace hashtag attribute as Embed.
