@@ -189,7 +189,7 @@ class DefaultStyles {
     final themeData = Theme.of(context);
     final defaultTextStyle = DefaultTextStyle.of(context);
     final baseStyle = defaultTextStyle.style.copyWith(
-      fontSize: 16,
+      fontSize: 14,
       height: 1.3,
       decoration: TextDecoration.none,
     );
