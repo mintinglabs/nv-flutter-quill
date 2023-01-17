@@ -132,18 +132,19 @@ class _TextLineState extends State<TextLine> {
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
-    if (widget.line.hasEmbed && widget.line.childCount == 1) {
-      // For video, it is always single child
-      final embed = widget.line.children.single as Embed;
-      return EmbedProxy(
-        widget.embedBuilder(
-          context,
-          widget.controller,
-          embed,
-          widget.readOnly,
-        ),
-      );
-    }
+    // NOVA : 這裡影響到 HASHTAG
+    // if (widget.line.hasEmbed && widget.line.childCount == 1) {
+    //   // For video, it is always single child
+    //   final embed = widget.line.children.single as Embed;
+    //   return EmbedProxy(
+    //     widget.embedBuilder(
+    //       context,
+    //       widget.controller,
+    //       embed,
+    //       widget.readOnly,
+    //     ),
+    //   );
+    // }
     final textSpan = _getTextSpanForWholeLine(context);
     final strutStyle = StrutStyle.fromTextStyle(textSpan.style!);
     final textAlign = _getTextAlign();
