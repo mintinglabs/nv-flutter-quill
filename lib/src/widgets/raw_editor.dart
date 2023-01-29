@@ -1075,8 +1075,14 @@ class RawEditorState extends EditorState
       return;
     }
     if (_hasFocus) {
+      final keyboardAlreadyShown = _keyboardVisible;
       openConnectionIfNeeded();
-      _showCaretOnScreen();
+      if (!keyboardAlreadyShown) {
+        /// delay 500 milliseconds for waiting keyboard show up
+        Future.delayed(const Duration(milliseconds: 500), _showCaretOnScreen);
+      } else {
+        _showCaretOnScreen();
+      }
     } else {
       widget.focusNode.requestFocus();
     }
@@ -1417,6 +1423,17 @@ class RawEditorState extends EditorState
   void removeTextPlaceholder() {
     // this is needed for Scribble (Stylus input) in Apple platforms
     // and this package does not implement this feature
+  }
+
+  @override
+  void didChangeInputControl(
+      TextInputControl? oldControl, TextInputControl? newControl) {
+    // TODO: implement didChangeInputControl
+  }
+
+  @override
+  void performSelector(String selectorName) {
+    // TODO: implement performSelector
   }
 }
 

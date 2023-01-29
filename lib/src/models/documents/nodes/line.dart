@@ -384,7 +384,7 @@ class Line extends Container<Leaf?> {
     }
 
     final remaining = len - local;
-    if (remaining > 0) {
+    if (remaining > 0 && nextLine != null) {
       final rest = nextLine!.collectStyle(0, remaining);
       _handle(rest);
     }
@@ -419,7 +419,7 @@ class Line extends Container<Leaf?> {
     // TODO: add line style and parent's block style
 
     final remaining = len - local;
-    if (remaining > 0) {
+    if (remaining > 0 && nextLine != null) {
       final rest =
           nextLine!.collectAllIndividualStyles(0, remaining, beg: local);
       result.addAll(rest);
@@ -453,7 +453,7 @@ class Line extends Container<Leaf?> {
     }
 
     final remaining = len - local;
-    if (remaining > 0) {
+    if (remaining > 0 && nextLine != null) {
       final rest = nextLine!.collectAllStyles(0, remaining);
       result.addAll(rest);
     }
@@ -504,7 +504,7 @@ class Line extends Container<Leaf?> {
         }
       }
 
-      if (_len > 0) {
+      if (_len > 0 && nextLine != null) {
         _len = nextLine!._getPlainText(0, _len, plainText);
       }
     }
