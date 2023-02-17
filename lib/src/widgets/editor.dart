@@ -174,12 +174,16 @@ class QuillEditor extends StatefulWidget {
       this.onSingleLongTapMoveUpdate,
       this.onSingleLongTapEnd,
       this.embedBuilders,
+      this.unknownEmbedBuilder,
       this.linkActionPickerDelegate = defaultLinkActionPickerDelegate,
       this.customStyleBuilder,
       this.locale,
       this.floatingCursorDisabled = false,
       this.textSelectionControls,
       this.onImagePaste,
+      this.customShortcuts,
+      this.customActions,
+      this.detectWordBoundary = true,
       Key? key})
       : super(key: key);
 
@@ -359,6 +363,7 @@ class QuillEditor extends StatefulWidget {
       onSingleLongTapEnd;
 
   final Iterable<EmbedBuilder>? embedBuilders;
+  final EmbedsBuilder? unknownEmbedBuilder;
   final CustomStyleBuilder? customStyleBuilder;
 
   /// The locale to use for the editor toolbar, defaults to system locale
@@ -392,6 +397,11 @@ class QuillEditor extends StatefulWidget {
   /// Returns the url of the image if the image should be inserted.
   final Future<String?> Function(Uint8List imageBytes)? onImagePaste;
 
+  final Map<LogicalKeySet, Intent>? customShortcuts;
+  final Map<Type, Action<Intent>>? customActions;
+
+  final bool detectWordBoundary;
+
   @override
   QuillEditorState createState() => QuillEditorState();
 }
@@ -406,7 +416,8 @@ class QuillEditorState extends State<QuillEditor>
   void initState() {
     super.initState();
     _selectionGestureDetectorBuilder =
-        _QuillEditorSelectionGestureDetectorBuilder(this);
+        _QuillEditorSelectionGestureDetectorBuilder(
+            this, widget.detectWordBoundary);
   }
 
   @override
@@ -456,12 +467,8 @@ class QuillEditorState extends State<QuillEditor>
       readOnly: widget.readOnly,
       placeholder: widget.placeholder,
       onLaunchUrl: widget.onLaunchUrl,
-      toolbarOptions: ToolbarOptions(
-        copy: showSelectionToolbar,
-        cut: showSelectionToolbar,
-        paste: showSelectionToolbar,
-        selectAll: showSelectionToolbar,
-      ),
+      contextMenuBuilder:
+          showSelectionToolbar ? RawEditor.defaultContextMenuBuilder : null,
       showSelectionHandles: isMobile(theme.platform),
       showCursor: widget.showCursor,
       cursorStyle: CursorStyle(
@@ -491,11 +498,19 @@ class QuillEditorState extends State<QuillEditor>
         node,
         readOnly,
       ) =>
-          _buildCustomBlockEmbed(node, context, controller, readOnly),
+          _buildCustomBlockEmbed(
+        node,
+        context,
+        controller,
+        readOnly,
+        widget.unknownEmbedBuilder,
+      ),
       linkActionPickerDelegate: widget.linkActionPickerDelegate,
       customStyleBuilder: widget.customStyleBuilder,
       floatingCursorDisabled: widget.floatingCursorDisabled,
       onImagePaste: widget.onImagePaste,
+      customShortcuts: widget.customShortcuts,
+      customActions: widget.customActions,
     );
 
     final editor = I18n(
@@ -503,6 +518,7 @@ class QuillEditorState extends State<QuillEditor>
       child: selectionEnabled
           ? _selectionGestureDetectorBuilder.build(
               behavior: HitTestBehavior.translucent,
+              detectWordBoundary: widget.detectWordBoundary,
               child: child,
             )
           : child,
@@ -525,18 +541,22 @@ class QuillEditorState extends State<QuillEditor>
     return editor;
   }
 
-  Widget _buildCustomBlockEmbed(Embed node, BuildContext context,
-      QuillController controller, bool readOnly) {
+  Widget _buildCustomBlockEmbed(
+    Embed node,
+    BuildContext context,
+    QuillController controller,
+    bool readOnly,
+    EmbedsBuilder? unknownEmbedBuilder,
+  ) {
     final builders = widget.embedBuilders;
 
+    var _node = node;
+    // Creates correct node for custom embed
+    if (node.value.type == BlockEmbed.customType) {
+      _node = Embed(CustomBlockEmbed.fromJsonString(node.value.data));
+    }
+
     if (builders != null) {
-      var _node = node;
-
-      // Creates correct node for custom embed
-      if (node.value.type == BlockEmbed.customType) {
-        _node = Embed(CustomBlockEmbed.fromJsonString(node.value.data));
-      }
-
       for (final builder in builders) {
         if (builder.key == _node.value.type) {
           return builder.build(context, controller, _node, readOnly);
@@ -546,10 +566,15 @@ class QuillEditorState extends State<QuillEditor>
       return defaultEmbedBuilder(context, controller, node, readOnly);
     }
 
+    if (unknownEmbedBuilder != null) {
+      return unknownEmbedBuilder(context, controller, _node, readOnly);
+    }
+
     throw UnimplementedError(
       'Embeddable type "${node.value.type}" is not supported by supplied '
       'embed builders. You must pass your own builder function to '
-      'embedBuilders property of QuillEditor or QuillField widgets.',
+      'embedBuilders property of QuillEditor or QuillField widgets or '
+      'specify an unknownEmbedBuilder.',
     );
   }
 
@@ -569,10 +594,12 @@ class QuillEditorState extends State<QuillEditor>
 
 class _QuillEditorSelectionGestureDetectorBuilder
     extends EditorTextSelectionGestureDetectorBuilder {
-  _QuillEditorSelectionGestureDetectorBuilder(this._state)
-      : super(delegate: _state);
+  _QuillEditorSelectionGestureDetectorBuilder(
+      this._state, this._detectWordBoundary)
+      : super(delegate: _state, detectWordBoundary: _detectWordBoundary);
 
   final QuillEditorState _state;
+  final bool _detectWordBoundary;
 
   @override
   void onForcePressStart(ForcePressDetails details) {
@@ -702,9 +729,15 @@ class _QuillEditorSelectionGestureDetectorBuilder
             case PointerDeviceKind.unknown:
               // On macOS/iOS/iPadOS a touch tap places the cursor at the edge
               // of the word.
-              renderEditor!
-                ..selectWordEdge(SelectionChangedCause.tap)
-                ..onSelectionCompleted();
+              if (_detectWordBoundary) {
+                renderEditor!
+                  ..selectWordEdge(SelectionChangedCause.tap)
+                  ..onSelectionCompleted();
+              } else {
+                renderEditor!
+                  ..selectPosition(cause: SelectionChangedCause.tap)
+                  ..onSelectionCompleted();
+              }
               break;
             case PointerDeviceKind.trackpad:
               // TODO: Handle this case.

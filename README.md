@@ -90,7 +90,7 @@ You can then write this to storage.
 To open a FlutterQuill editor with an existing JSON representation that you've previously stored, you can do something like this:
 
 ```dart
-var myJSON = jsonDecode(incomingJSONText);
+var myJSON = jsonDecode(r'{"insert":"hello\n"}');
 _controller = QuillController(
           document: Document.fromJson(myJSON),
           selection: TextSelection.collapsed(offset: 0),
@@ -346,7 +346,7 @@ QuillToolbar(locale: Locale('fr'), ...)
 QuillEditor(locale: Locale('fr'), ...)
 ```
 
-Currently, translations are available for these 25 locales:
+Currently, translations are available for these 26 locales:
 
 * `Locale('en')`
 * `Locale('ar')`
@@ -367,6 +367,7 @@ Currently, translations are available for these 25 locales:
 * `Locale('pl')`
 * `Locale('vi')`
 * `Locale('id')`
+* `Locale('ms')`
 * `Locale('nl')`
 * `Locale('no')`
 * `Locale('fa')`
@@ -383,10 +384,10 @@ The translation file is located at [toolbar.i18n.dart](lib/src/translations/tool
 Having your document stored in Quill Delta format is sometimes not enough. Often you'll need to convert
 it to other formats such as HTML in order to publish it, or send an email. One option is to use
 [vsc_quill_delta_to_html](https://pub.dev/packages/vsc_quill_delta_to_html) to convert your document
-to HTML. This package has full support for all Quill operations - including images, videos, formulas, 
-tables, and mentions. Conversion can be performed in vanilla Dart (i.e., server-side or CLI) or in Flutter. 
+to HTML. This package has full support for all Quill operations - including images, videos, formulas,
+tables, and mentions. Conversion can be performed in vanilla Dart (i.e., server-side or CLI) or in Flutter.
 It is a complete Dart part of the popular and mature [quill-delta-to-html](https://www.npmjs.com/package/quill-delta-to-html)
-Typescript/Javascript package. 
+Typescript/Javascript package.
 
 ## Sponsors
 
