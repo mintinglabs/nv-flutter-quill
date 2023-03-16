@@ -410,7 +410,10 @@ class QuillEditorState extends State<QuillEditor>
     super.initState();
     _selectionGestureDetectorBuilder =
         _QuillEditorSelectionGestureDetectorBuilder(
-            this, widget.detectWordBoundary);
+      this,
+      widget.detectWordBoundary,
+      widget.readOnly,
+    );
   }
 
   @override
@@ -588,11 +591,12 @@ class QuillEditorState extends State<QuillEditor>
 class _QuillEditorSelectionGestureDetectorBuilder
     extends EditorTextSelectionGestureDetectorBuilder {
   _QuillEditorSelectionGestureDetectorBuilder(
-      this._state, this._detectWordBoundary)
+      this._state, this._detectWordBoundary, this._readyOnly)
       : super(delegate: _state, detectWordBoundary: _detectWordBoundary);
 
   final QuillEditorState _state;
   final bool _detectWordBoundary;
+  final bool _readyOnly;
 
   @override
   void onForcePressStart(ForcePressDetails details) {
@@ -658,12 +662,12 @@ class _QuillEditorSelectionGestureDetectorBuilder
   @override
   void onTapDown(TapDownDetails details) {
     // by NOVAAPP-1036 single tap show tool bar
-    if (hasTapDownShowToolbar) {
+    if (hasTapDownShowToolbar && !_readyOnly) {
       editor!.hideToolbar();
       hasTapDownShowToolbar = false;
     } else {
       Future.delayed(const Duration(milliseconds: 200), () {
-        editor!.showToolbar();
+        if (!_readyOnly) editor!.showToolbar();
       });
       hasTapDownShowToolbar = true;
     }
