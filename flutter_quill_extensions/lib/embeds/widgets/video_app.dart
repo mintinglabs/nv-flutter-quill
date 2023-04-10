@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
 
 /// Widget for playing back video
 /// Refer to https://github.com/flutter/plugins/tree/master/packages/video_player/video_player
@@ -26,16 +26,16 @@ class VideoApp extends StatefulWidget {
 }
 
 class _VideoAppState extends State<VideoApp> {
-  late VideoPlayerController _controller;
-  GlobalKey videoContainerKey = GlobalKey();
+  late final CachedVideoPlayerController _controller;
+  final GlobalKey videoContainerKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
 
     _controller = widget.videoUrl.startsWith('http')
-        ? VideoPlayerController.network(widget.videoUrl)
-        : VideoPlayerController.file(File(widget.videoUrl))
+        ? CachedVideoPlayerController.network(widget.videoUrl)
+        : CachedVideoPlayerController.file(File(widget.videoUrl))
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized,
         // even before the play button has been pressed.
@@ -83,22 +83,27 @@ class _VideoAppState extends State<VideoApp> {
                 : _controller.play();
           });
         },
-        child: Stack(alignment: Alignment.center, children: [
-          Center(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Center(
               child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          )),
-          _controller.value.isPlaying
-              ? const SizedBox.shrink()
-              : Container(
-                  color: const Color(0xfff5f5f5),
-                  child: const Icon(
-                    Icons.play_arrow,
-                    size: 60,
-                    color: Colors.blueGrey,
-                  ))
-        ]),
+                aspectRatio: _controller.value.aspectRatio,
+                child: CachedVideoPlayer(_controller),
+              ),
+            ),
+            _controller.value.isPlaying
+                ? const SizedBox.shrink()
+                : const ColoredBox(
+                    color: Color(0xfff5f5f5),
+                    child: Icon(
+                      Icons.play_arrow,
+                      size: 60,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }
