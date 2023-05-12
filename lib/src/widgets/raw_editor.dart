@@ -4,7 +4,6 @@ import 'dart:math' as math;
 // ignore: unnecessary_import
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -302,6 +301,9 @@ class RawEditorState extends EditorState
   final LayerLink _endHandleLayerLink = LayerLink();
 
   TextDirection get _textDirection => Directionality.of(context);
+
+  @override
+  void insertContent(KeyboardInsertedContent content) {}
 
   /// Returns the [ContextMenuButtonItem]s representing the buttons in this
   /// platform's default selection menu for [RawEditor].

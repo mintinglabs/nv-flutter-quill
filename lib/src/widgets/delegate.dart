@@ -311,7 +311,8 @@ class EditorTextSelectionGestureDetectorBuilder {
   ///  which triggers this callback./lib/src/material/text_field.dart
   @protected
   void onDragSelectionUpdate(
-      DragStartDetails startDetails, DragUpdateDetails updateDetails) {
+      //DragStartDetails startDetails,
+      DragUpdateDetails updateDetails) {
     renderEditor!.extendSelection(updateDetails.globalPosition,
         cause: SelectionChangedCause.drag);
   }
