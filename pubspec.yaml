@@ -6,8 +6,8 @@ homepage: https://bulletjournal.us/home/index.html
 repository: https://github.com/singerdmx/flutter-quill
 
 environment:
-  sdk: ">=3.10.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
