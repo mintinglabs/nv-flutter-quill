@@ -32,7 +32,7 @@ dependencies:
   string_validator: ^1.0.0
   cached_video_player: ^2.0.4
   gallery_saver: ^2.3.2
-  math_keyboard: ^0.1.6
+  math_keyboard: ^0.2.0
 
 dev_dependencies:
   flutter_test:

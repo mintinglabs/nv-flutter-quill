@@ -12,7 +12,7 @@ import 'node.dart';
 /// forwards operation to that child.
 ///
 /// Most of the operation handling logic is implemented by [Line] and [Text].
-abstract class Container<T extends Node?> extends Node {
+abstract base class Container<T extends Node?> extends Node {
   final LinkedList<Node> _children = LinkedList<Node>();
 
   /// List of children.
