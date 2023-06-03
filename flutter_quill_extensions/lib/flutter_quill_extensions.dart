@@ -1,7 +1,16 @@
 library flutter_quill_extensions;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart'
+    hide
+        OnImagePickCallback,
+        OnVideoPickCallback,
+        MediaPickSettingSelector,
+        FilePickImpl,
+        WebImagePickImpl,
+        ImageButton,
+        WebVideoPickImpl,
+        VideoButton;
 
 import 'embeds/builders.dart';
 import 'embeds/embed_types.dart';

@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart'
+    hide
+        Text,
+        OnImagePickCallback,
+        OnVideoPickCallback,
+        MediaPickSettingSelector,
+        FilePickImpl,
+        WebImagePickImpl,
+        ImageButton,
+        WebVideoPickImpl,
+        VideoButton,
+        MediaPickSetting,
+        ImageVideoUtils,
+        LinkDialog;
 import 'package:image_picker/image_picker.dart';
 
 import '../embed_types.dart';

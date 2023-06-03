@@ -2,7 +2,21 @@ import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart'
+    hide
+        Text,
+        OnImagePickCallback,
+        OnVideoPickCallback,
+        MediaPickSettingSelector,
+        FilePickImpl,
+        WebImagePickImpl,
+        ImageButton,
+        WebVideoPickImpl,
+        VideoButton,
+        MediaPickSetting,
+        ImageVideoUtils,
+        LinkDialog,
+        isImageBase64;
 import 'package:photo_view/photo_view.dart';
 
 import '../utils.dart';

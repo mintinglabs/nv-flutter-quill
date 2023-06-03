@@ -18,6 +18,10 @@ typedef DeleteCallback = void Function(int cursorPosition, bool forward);
 typedef HashtagCallback = Future<void> Function(
     int index, int len, String data);
 
+/// 插入tag时,返回值为false则不插入Tag标签
+typedef GenerateHashtagCallback = Future<bool> Function(
+    int index, int len, String data);
+
 class QuillController extends ChangeNotifier {
   QuillController({
     required Document document,
@@ -28,6 +32,7 @@ class QuillController extends ChangeNotifier {
     this.onSelectionCompleted,
     this.onSelectionChanged,
     this.onHashtagTriggered,
+    this.onGenerateHashtagCallback,
   })  : _document = document,
         _selection = selection,
         _keepStyleOnNewLine = keepStyleOnNewLine;
@@ -68,6 +73,8 @@ class QuillController extends ChangeNotifier {
 
   /// Custom Hashtag triggered
   HashtagCallback? onHashtagTriggered;
+
+  GenerateHashtagCallback? onGenerateHashtagCallback;
 
   void Function()? onSelectionCompleted;
   void Function(TextSelection textSelection)? onSelectionChanged;
@@ -194,8 +201,12 @@ class QuillController extends ChangeNotifier {
   bool boldStyle = false;
 
   void replaceText(
-      int index, int len, Object? data, TextSelection? textSelection,
-      {bool ignoreFocus = false}) {
+    int index,
+    int len,
+    Object? data,
+    TextSelection? textSelection, {
+    bool ignoreFocus = false,
+  }) {
     assert(data is String || data is Embeddable);
 
     if (onReplaceText != null && !onReplaceText!(index, len, data)) {
@@ -266,12 +277,18 @@ class QuillController extends ChangeNotifier {
         if (data is String && data != hashtagSymbol) {
           disableStyleOfWhitespaceEndSymbol();
         }
-        document.replace(
-            hashtagSymbolIndex, hashtagString.length, embedHashtag);
 
-        // Move cursor behind hashtag embed
-        textSelection = TextSelection.collapsed(offset: hashtagSymbolIndex + 1);
-
+        _onGenerateHashtagCallback(
+                hashtagSymbolIndex, hashtagString.length, hashtagString)
+            .then((value) {
+          if (value) {
+            document.replace(
+                hashtagSymbolIndex, hashtagString.length, embedHashtag);
+            // Move cursor behind hashtag embed
+            textSelection =
+                TextSelection.collapsed(offset: hashtagSymbolIndex + 1);
+          }
+        });
         shouldRetainDelta = false;
       } // [END]: GTStudio: Replace hashtag attribute as Embed.
 
@@ -298,7 +315,7 @@ class QuillController extends ChangeNotifier {
 
     if (textSelection != null) {
       if (delta == null || delta.isEmpty) {
-        _updateSelection(textSelection, ChangeSource.LOCAL);
+        _updateSelection(textSelection!, ChangeSource.LOCAL);
       } else {
         final user = Delta()
           ..retain(index)
@@ -306,9 +323,9 @@ class QuillController extends ChangeNotifier {
           ..delete(len);
         final positionDelta = getPositionDelta(user, delta);
         _updateSelection(
-          textSelection.copyWith(
-            baseOffset: textSelection.baseOffset + positionDelta,
-            extentOffset: textSelection.extentOffset + positionDelta,
+          textSelection!.copyWith(
+            baseOffset: textSelection!.baseOffset + positionDelta,
+            extentOffset: textSelection!.extentOffset + positionDelta,
           ),
           ChangeSource.LOCAL,
         );
@@ -343,6 +360,14 @@ class QuillController extends ChangeNotifier {
     final hashtagIndex = _indexOfHashtagFromCurrent(index);
     final hashtagString = document.toPlainText().substring(hashtagIndex, index);
     onHashtagTriggered?.call(index, len, hashtagString + currentChar);
+  }
+
+  Future<bool> _onGenerateHashtagCallback(
+      int index, int len, String hashtagString) async {
+    if (onGenerateHashtagCallback == null) {
+      return Future<bool>.value(true);
+    }
+    return await onGenerateHashtagCallback!.call(index, len, hashtagString);
   }
 
   static const String hashtagSymbol = '#';

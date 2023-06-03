@@ -5,8 +5,8 @@ homepage: https://bulletjournal.us/home/index.html
 repository: https://github.com/singerdmx/flutter-quill/tree/master/flutter_quill_extensions
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
@@ -22,9 +22,9 @@ dependencies:
   math_keyboard: ^0.2.0
   string_validator: ^1.0.0
 
-#dependency_overrides:
-#  flutter_quill:
-#    path: ../
+dependency_overrides:
+  flutter_quill:
+    path: ../
 
 dev_dependencies:
   flutter_test:

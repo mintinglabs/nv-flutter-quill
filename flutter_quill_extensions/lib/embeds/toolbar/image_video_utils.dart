@@ -3,7 +3,20 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
+import 'package:flutter_quill/flutter_quill.dart'
+    hide
+        Text,
+        OnImagePickCallback,
+        OnVideoPickCallback,
+        MediaPickSettingSelector,
+        FilePickImpl,
+        WebImagePickImpl,
+        ImageButton,
+        WebVideoPickImpl,
+        VideoButton,
+        MediaPickSetting,
+        ImageVideoUtils,
+        LinkDialog;
 import 'package:flutter_quill/translations.dart';
 import 'package:image_picker/image_picker.dart';
 

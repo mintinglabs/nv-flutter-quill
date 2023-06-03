@@ -3,7 +3,7 @@ library universal_ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:universal_html/html.dart' as html;
+// import 'package:universal_html/html.dart' as html;
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../widgets/responsive_widget.dart';
@@ -37,29 +37,30 @@ class ImageEmbedBuilderWeb implements EmbedBuilder {
     Embed node,
     bool readOnly,
   ) {
-    final imageUrl = node.value.data;
-    if (isImageBase64(imageUrl)) {
-      // TODO: handle imageUrl of base64
-      return const SizedBox();
-    }
-    final size = MediaQuery.of(context).size;
-    UniversalUI().platformViewRegistry.registerViewFactory(
-        imageUrl, (viewId) => html.ImageElement()..src = imageUrl);
-    return Padding(
-      padding: EdgeInsets.only(
-        right: ResponsiveWidget.isMediumScreen(context)
-            ? size.width * 0.5
-            : (ResponsiveWidget.isLargeScreen(context))
-                ? size.width * 0.75
-                : size.width * 0.2,
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.45,
-        child: HtmlElementView(
-          viewType: imageUrl,
-        ),
-      ),
-    );
+    return const SizedBox();
+    // final imageUrl = node.value.data;
+    // if (isImageBase64(imageUrl)) {
+    //   // TODO: handle imageUrl of base64
+    //   return const SizedBox();
+    // }
+    // final size = MediaQuery.of(context).size;
+    // UniversalUI().platformViewRegistry.registerViewFactory(
+    //     imageUrl, (viewId) => html.ImageElement()..src = imageUrl);
+    // return Padding(
+    //   padding: EdgeInsets.only(
+    //     right: ResponsiveWidget.isMediumScreen(context)
+    //         ? size.width * 0.5
+    //         : (ResponsiveWidget.isLargeScreen(context))
+    //             ? size.width * 0.75
+    //             : size.width * 0.2,
+    //   ),
+    //   child: SizedBox(
+    //     height: MediaQuery.of(context).size.height * 0.45,
+    //     child: HtmlElementView(
+    //       viewType: imageUrl,
+    //     ),
+    //   ),
+    // );
   }
 }
 
@@ -78,13 +79,13 @@ class VideoEmbedBuilderWeb implements EmbedBuilder {
       }
     }
 
-    UniversalUI().platformViewRegistry.registerViewFactory(
-        videoUrl,
-        (id) => html.IFrameElement()
-          ..width = MediaQuery.of(context).size.width.toString()
-          ..height = MediaQuery.of(context).size.height.toString()
-          ..src = videoUrl
-          ..style.border = 'none');
+    // UniversalUI().platformViewRegistry.registerViewFactory(
+    //     videoUrl,
+    //     (id) => html.IFrameElement()
+    //       ..width = MediaQuery.of(context).size.width.toString()
+    //       ..height = MediaQuery.of(context).size.height.toString()
+    //       ..src = videoUrl
+    //       ..style.border = 'none');
 
     return SizedBox(
       height: 500,
