@@ -200,13 +200,13 @@ class QuillController extends ChangeNotifier {
   // NOVA : NOVAAPP-269 由於非英文輸入法是刪除後再插入，所以需要保持選擇狀態
   bool boldStyle = false;
 
-  void replaceText(
+  Future<void> replaceText(
     int index,
     int len,
     Object? data,
     TextSelection? textSelection, {
     bool ignoreFocus = false,
-  }) {
+  }) async {
     assert(data is String || data is Embeddable);
 
     if (onReplaceText != null && !onReplaceText!(index, len, data)) {
@@ -278,7 +278,7 @@ class QuillController extends ChangeNotifier {
           disableStyleOfWhitespaceEndSymbol();
         }
 
-        _onGenerateHashtagCallback(
+       await _onGenerateHashtagCallback(
                 hashtagSymbolIndex, hashtagString.length, hashtagString)
             .then((value) {
           if (value) {
