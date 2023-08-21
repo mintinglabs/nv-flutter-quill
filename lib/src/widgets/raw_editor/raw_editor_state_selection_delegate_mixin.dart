@@ -161,4 +161,7 @@ mixin RawEditorStateSelectionDelegateMixin on EditorState
 
   @override
   bool get selectAllEnabled => widget.contextMenuBuilder != null;
+
+  @override
+  bool get liveTextInputEnabled => false;
 }

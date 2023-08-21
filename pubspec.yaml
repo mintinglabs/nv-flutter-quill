@@ -6,8 +6,8 @@ homepage: https://bulletjournal.us/home/index.html
 repository: https://github.com/singerdmx/flutter-quill
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: '>=3.1.0 <4.0.0'
+  flutter: ">=3.13.0"
 
 dependencies:
   flutter:
@@ -17,17 +17,17 @@ dependencies:
   flutter_colorpicker: ^1.0.3
   flutter_keyboard_visibility: ^5.4.0
   quiver: ^3.2.1
-  tuple: ^2.0.1
+  tuple: ^2.0.0
   url_launcher: ^6.1.9
   pedantic: ^1.11.1
-  characters: ^1.2.1
+  characters: ^1.3.0
   diff_match_patch: ^0.4.1
   i18n_extension: ^9.0.0
   device_info_plus: ^9.0.0
   platform: ^3.1.0
   pasteboard: ^0.2.0
 
-  image_picker: ^0.8.5+3
+  image_picker: ^1.0.0
   photo_view: ^0.14.0
   string_validator: ^1.0.0
   cached_video_player: ^2.0.4

@@ -330,6 +330,7 @@ class RawEditorState extends EditorState
       onSelectAll: selectAllEnabled
           ? () => selectAll(SelectionChangedCause.toolbar)
           : null,
+      onLiveTextInput: null,
     );
   }
 
